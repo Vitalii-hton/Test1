@@ -6,7 +6,7 @@
     "url": "https://www.weis.world/ua"
   },
   "model": {
-    "usdzURL": "https://github.com/Vitalii-hton/Test/raw/main/carcas1.usdc",
+    "usdcURL": "https://github.com/Vitalii-hton/Test/raw/main/carcas1.usdc",
     "scale": 1.0
   }
 }
