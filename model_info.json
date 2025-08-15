@@ -1,0 +1,12 @@
+{
+  "targetImage": {
+    "name": "marker1",
+    "imageURL": "https://raw.githubusercontent.com/Vitalii-hton/Test/main/carcas.jpg",
+    "physicalWidth": 0.25,
+    "url": "https://www.weis.world/ua"
+  },
+  "model": {
+    "usdzURL": "https://github.com/Vitalii-hton/Test/raw/main/carcas1.usdc",
+    "scale": 1.0
+  }
+}
