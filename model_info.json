@@ -2,11 +2,11 @@
   "targetImage": {
     "name": "marker1",
     "imageURL": "https://raw.githubusercontent.com/Vitalii-hton/Test/main/carcase1.jpg",
-    "physicalWidth": 0.69,
+    "physicalWidth": 0.72,
     "url": "https://www.weis.world/ua"
   },
   "model": {
-    "usdcURL": "https://github.com/Vitalii-hton/Test/raw/main/carcas6.usdc",
+    "usdcURL": "https://github.com/Vitalii-hton/Test/raw/main/carcas7.usdc",
     "scale": 1.0
   }
 }
