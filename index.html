@@ -1,52 +1,149 @@
-<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+<!DOCTYPE html>
+<html lang="ukr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR Quick Look — MOON</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    /* Стили кнопки */
+    .ar-button {
+      background-color: #e40b29;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    .ar-button:hover {
+      background-color: #0056b3;
+    }
+    model-viewer {
+      width: 100%;
+      max-width: 600px;
+      height: 500px;
+      border-radius: 12px;
+      background: #f0f0f0;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body style="text-align:center; padding:50px; font-family:sans-serif;">
+  <h1>MOON x Hello Kitty</h1>
+  <p>Oral beauty:</p>
 
-<style>
-  .arjs-loader {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  <!-- Кнопка для ручного запуска AR -->
+  <button id="ar-button" class="ar-button">
+    📱 Open AR
+  </button>
 
-  .arjs-loader div {
-    text-align: center;
-    font-size: 1.25em;
-    color: white;
-  }
-</style>
+  <!-- Кнопка для открытия во внешнем браузере (Safari/Chrome), скрыта по умолчанию -->
+  <button id="open-browser" class="ar-button" style="display:none;">
+    🌐 Open in Safari/Chrome
+  </button>
 
-<!-- rawgithack development URL -->
-<!--<script src='https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js'></script>-->
-<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@master/aframe/build/aframe-ar-nft.js"></script>
+  <!-- 3D-предпросмотр -->
+  <model-viewer
+    id="ar-viewer"
+    src="https://vitalii-hton.github.io/weisworld1/kitty ar2.glb"
+    ios-src="https://vitalii-hton.github.io/weisworld1/try37.usdz#checkoutTitle=Moon&checkoutSubtitle=Oral%20beauty&price=%2439.99&callToAction=Buy%20Now"
+    alt="3D Model"
+    camera-controls
+    auto-rotate
+    ar
+    ar-modes="quick-look"
+    style="width:100%; height:500px;">
+  </model-viewer>
 
+  <!-- Скрытая кнопка для автозапуска -->
+  <button id="hidden-ar-button" style="display:none;"></button>
 
-<body style='margin : 0px; overflow: hidden;'>
-   <!-- minimal loader shown until image descriptors are loaded -->
-  <div class="arjs-loader">
-    <div>Loading, please wait...</div>
-  </div>
-    <a-scene
-        vr-mode-ui='enabled: false;'
-        renderer="logarithmicDepthBuffer: true; precision: medium;"
-        embedded arjs='trackingMethod: best; sourceType: webcam; debugUIEnabled: false;'>
+  <script>
+    const arButton = document.getElementById('ar-button');
+    const arViewer = document.getElementById('ar-viewer');
 
-        <!-- use rawgithack to retrieve the correct url for nft marker (see 'pinball' below) -->
-        <a-nft
-            type='nft' url='https://vitalii-hton.github.io/assets/trex/trex-image/trex'
-            smooth='true' smoothCount='10' smoothTolerance='0.01' smoothThreshold='5'>
-            <a-entity
-                gltf-model="https://vitalii-hton.github.io/Test1/assets/trex/scene.gltf"
-                scale="5 5 5"
-                position="150 300 -100"
-                >
-            </a-entity>
-        </a-nft>
-		<a-entity camera></a-entity>
-    </a-scene>
+    // обычная кнопка запуска AR
+    arButton.addEventListener('click', () => {
+      arViewer.activateAR();
+    });
+
+    // скрытая кнопка для автозапуска
+    const hiddenBtn = document.getElementById('hidden-ar-button');
+    hiddenBtn.addEventListener("click", () => {
+      arViewer.activateAR();
+    });
+
+    // имитация клика по скрытой кнопке через 1.5 сек
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        hiddenBtn.click();
+      }, 1500);
+    });
+
+  // ===============================
+  // ЛОГИКА для кнопки "Open in Safari/Chrome"
+  // ===============================
+  (function() {
+    const openBtn = document.getElementById('open-browser');
+    const url = window.location.href; 
+    const ua = navigator.userAgent || '';
+
+    const isInAppBrowser = /Instagram|FBAN|FBAV|FBSV|FB_IAB/i.test(ua);
+    if (!isInAppBrowser) {
+      openBtn.style.display = 'none';
+    } else {
+      openBtn.style.display = 'inline-block';
+    }
+
+    function tryOpen(urlToOpen) {
+      const a = document.createElement('a');
+      a.href = urlToOpen;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ try { document.body.removeChild(a); } catch(e){} }, 2000);
+    }
+
+    function openInExternalBrowser() {
+      const xSafari = 'x-safari-https://' + url.replace(/^https?:\/\//i, '');
+      const safariTab = 'com-apple-mobilesafari-tab:' + url;
+      const intentUrl = 'intent://' + url.replace(/^https?:\/\//i, '') +
+                        '#Intent;scheme=https;package=com.android.chrome;end';
+
+      tryOpen(xSafari);
+      setTimeout(()=> tryOpen(safariTab), 300);
+      setTimeout(()=> tryOpen(intentUrl), 700);
+      setTimeout(()=> tryOpen(url), 1100);
+      setTimeout(()=> {
+        try { window.open(url, '_blank', 'noopener'); } catch(e){}
+      }, 1400);
+    }
+
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openInExternalBrowser();
+      setTimeout(()=> {
+        if (confirm('Если сайт всё ещё открыт внутри Instagram и AR не работает — открыть инструкцию, как запустить в Safari?')) {
+          window.location.href = '/open-in-safari-instructions.html';
+        }
+      }, 1600);
+    });
+  })();
+
+  // ===============================
+  // 👉 ДОБАВЬ ВОТ ЭТОТ БЛОК
+  // ===============================
+  const viewer = document.getElementById('ar-viewer');
+  viewer.addEventListener('quick-look-button-tapped', () => {
+    window.open(
+      'https://moonoralbeauty.com/products/moon-x-hello-kitty%C2%AE-teeth-whitening-pen-duo',
+      '_blank'
+    );
+  });
+</script>
 </body>
+</html>
