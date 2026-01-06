@@ -4,78 +4,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <style>
-    /* Базовые настройки для AR Quick Look */
+    /* === ГЛОБАЛЬНОЕ ЦЕНТРИРОВАНИЕ === */
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background: transparent !important; /* Убираем системную подложку */
+      background: transparent !important;
       overflow: hidden;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; /* Центр по горизонтали */
+      align-items: center;     /* Центр по вертикали */
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
+    /* Общие стили для сцен */
     .scene {
       position: absolute;
       width: 90%;
       max-width: 380px;
       opacity: 0;
-      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
       pointer-events: none;
+      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform: scale(0.95);
     }
 
     .scene.active {
       opacity: 1;
       pointer-events: auto;
+      transform: scale(1);
     }
 
-    /* === ПРОЗРАЧНЫЙ БАННЕР (ЭФФЕКТ СТЕКЛА) === */
+    /* === СТИЛЬ СТЕКЛЯННОЙ КАРТОЧКИ (ДЛЯ ОБОИХ БАННЕРОВ) === */
     .banner-card {
-      /* background: transparent делает фон полностью прозрачным. 
-         Мы добавим 0.01 для стабильности работы блюра в AR */
-      background: rgba(255, 255, 255, 0.01); 
-      
-      /* Размытие того, что находится за баннером (камеры) */
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      
-      /* Тонкая рамка, чтобы видеть границы "стекла" */
+      background: rgba(255, 255, 255, 0.01); /* Прозрачный фон */
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
       border: 0.5px solid rgba(255, 255, 255, 0.2);
-      
       border-radius: 24px;
-      padding: 16px 20px;
+      padding: 24px 20px; /* Увеличили padding для "воздуха" */
       display: flex;
       justify-content: space-between;
       align-items: center;
-      
-      /* Минимальная тень для объема */
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
     }
 
-    .text-content {
-      text-align: left;
+    /* Специальный стиль для центрирования текста в инструкции */
+    .instruction-layout {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
     }
 
+    /* === ТЕКСТ И ЭЛЕМЕНТЫ === */
     .brand-title {
       color: #000000;
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 700;
-      margin: 0;
+      letter-spacing: -0.4px;
+      margin-bottom: 4px;
     }
 
-    .product-info {
+    .product-info, .instruction-text {
       color: #000000;
-      font-size: 14px;
-      opacity: 0.6; /* Делаем текст полупрозрачным вместо серого цвета */
+      font-size: 15px;
+      opacity: 0.6;
+      margin: 0;
     }
 
     .url-info {
       color: #000000;
       font-size: 12px;
       opacity: 0.4;
+      margin-top: 2px;
     }
 
     .buy-button {
@@ -83,27 +85,51 @@
       text-decoration: none;
       font-weight: 600;
       font-size: 18px;
+      padding-left: 15px;
     }
 
-    /* Стили для инструкции (белый текст на камере) */
-    #scene-instruction {
-      text-align: center;
-      color: white;
-      text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+    /* Анимация точек/пальцев */
+    .dots-container {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+      justify-content: center;
     }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.5; }
+    }
+
   </style>
 </head>
 <body>
 
   <div id="scene-instruction" class="scene active">
-    <h2 style="margin:0;">Scale & Move</h2>
-    <p style="margin:5px 0 0; opacity:0.8;">Pinch to resize object</p>
+    <div class="banner-card instruction-layout">
+      <div class="dots-container">
+        <div class="dot"></div>
+        <div class="dot" style="animation-delay: 0.2s;"></div>
+      </div>
+      <div class="brand-title">Scale & Move</div>
+      <div class="instruction-text">Pinch to resize object</div>
+    </div>
   </div>
 
   <div id="scene-buy" class="scene">
     <div class="banner-card">
-      <div class="text-content">
-        <div class="brand-title">Moon</div>
+      <div class="text-content" style="text-align: left;">
+        <div class="brand-title" style="margin:0;">Moon</div>
         <div class="product-info">Oral beauty, $39.99</div>
         <div class="url-info">vitalii-hton.github.io</div>
       </div>
@@ -115,12 +141,17 @@
 
   <script>
     window.addEventListener('load', () => {
+      // Смена через 6 секунд
       setTimeout(() => {
-        document.getElementById('scene-instruction').classList.remove('active');
+        const inst = document.getElementById('scene-instruction');
+        const buy = document.getElementById('scene-buy');
+
+        inst.classList.remove('active');
+        
         setTimeout(() => {
-          document.getElementById('scene-buy').classList.add('active');
-        }, 500);
-      }, 5000); // Показать баннер через 5 секунд
+          buy.classList.add('active');
+        }, 600);
+      }, 6000);
     });
   </script>
 
